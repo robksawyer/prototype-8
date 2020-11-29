@@ -8,13 +8,7 @@ import useErrorBoundary from 'use-error-boundary'
 import { useTweaks } from 'use-tweaks'
 import { useInView } from 'react-intersection-observer'
 import useMobileDetect from 'use-mobile-detect-hook'
-import {
-  // extend,
-  Canvas,
-  useFrame,
-  useThree,
-  // useLoader,
-} from 'react-three-fiber'
+import { Canvas, useFrame, useThree } from 'react-three-fiber'
 import { EffectComposer } from '@react-three/postprocessing'
 import * as THREE from 'three'
 import { Html, useHelper, useTexture, OrbitControls } from '@react-three/drei'
@@ -26,6 +20,9 @@ import { gsap } from 'gsap'
 import styles from './MainScene.module.css'
 
 import Loader from '../Loader'
+
+// Shader stack
+import './shaders/defaultMaterial'
 
 // Texture loading examples
 // const envMap = useCubeTexture(
@@ -55,35 +52,46 @@ import Loader from '../Loader'
 //  />
 
 // Effects for the main scene
-const Effects = () => {
-  return <EffectComposer></EffectComposer>
-}
+// const Effects = () => {
+//   return <EffectComposer></EffectComposer>
+// }
+
+const ENABLE_HELPERS = 0
 
 const Scene = () => {
   const mesh = useRef()
   const { scene } = useThree()
   const group = useRef()
 
-  const texture = useTexture('/3d/textures/checkerboard.jpg')
-
   const spotLight = useRef()
   const pointLight = useRef()
 
-  useFrame(({ clock }) => {
-    mesh.current.rotation.x = (Math.sin(clock.elapsedTime) * Math.PI) / 4
-    mesh.current.rotation.y = (Math.sin(clock.elapsedTime) * Math.PI) / 4
-    mesh.current.rotation.z = (Math.sin(clock.elapsedTime) * Math.PI) / 4
-    mesh.current.position.x = Math.sin(clock.elapsedTime)
-    mesh.current.position.z = Math.sin(clock.elapsedTime)
-    group.current.rotation.y += 0.02
+  // Texture loading example
+  const texture = useTexture('/3d/textures/screencap.png')
+  texture.wrapS = texture.wrapT = THREE.MirroredRepeatWrapping
+
+  useFrame(({ clock, mouse }) => {
+    mesh.current.rotation.x = Math.sin(clock.elapsedTime) / 6
+    mesh.current.rotation.y = Math.sin(clock.elapsedTime) / 6
+    // mesh.current.rotation.z = (Math.sin(clock.elapsedTime) * Math.PI) / 4
+    // mesh.current.position.x = Math.sin(clock.elapsedTime)
+    // mesh.current.position.z = Math.sin(clock.elapsedTime)
+    // group.current.rotation.y += 0.02
+
+    mesh.current.material.uniforms.mouse.value = new THREE.Vector2(
+      mouse.x,
+      mouse.y
+    )
   })
 
   useEffect(() => void (spotLight.current.target = mesh.current), [scene])
-  // useHelper(spotLight, SpotLightHelper, 'teal')
-  // useHelper(pointLight, PointLightHelper, 0.5, 'hotpink')
-  // useHelper(mesh, BoxHelper, '#272740')
-  // useHelper(mesh, VertexNormalsHelper, 1, '#272740')
-  // useHelper(mesh, FaceNormalsHelper, 0.5, '#272740')
+  if (ENABLE_HELPERS) {
+    // useHelper(spotLight, SpotLightHelper, 'teal')
+    // useHelper(pointLight, PointLightHelper, 0.5, 'hotpink')
+    // useHelper(mesh, BoxHelper, '#272740')
+    // useHelper(mesh, VertexNormalsHelper, 1, '#272740')
+    // useHelper(mesh, FaceNormalsHelper, 0.5, '#272740')
+  }
 
   return (
     <>
@@ -105,8 +113,20 @@ const Scene = () => {
       />
       <mesh ref={mesh} position={[0, 2, 0]} castShadow>
         <icosahedronGeometry args={[1, 1]} attach="geometry" />
-        <meshBasicMaterial attach="material" map={texture} />
-        {/* <meshStandardMaterial wireframe attach="material" color="lightblue" /> */}
+        <defaultMaterial
+          attach="material"
+          side={THREE.DoubleSide}
+          time={0}
+          landscape={texture}
+          // resolution={new THREE.Vector4()}
+          // uvRate1={new THREE.Vector2(1, 1)}
+        />
+
+        {/* Standard Color Material Example */}
+        {/* <meshStandardMaterial attach="material" color="lightblue" /> */}
+
+        {/* Texture Material Example */}
+        {/* <meshBasicMaterial attach="material" map={texture} /> */}
       </mesh>
       <mesh rotation-x={-Math.PI / 2} receiveShadow>
         <planeBufferGeometry args={[100, 100]} attach="geometry" />
@@ -134,10 +154,10 @@ const MainScene = (props) => {
         style={{
           width: '100vw',
           height: 'calc(100vh - 50px)',
-          background: 'floralwhite',
+          background: 'black',
         }}
       >
-        <fog attach="fog" args={['floralwhite', 0, 20]} />
+        <fog attach="fog" args={['black', 0, 20]} />
         <Suspense
           fallback={
             <Html>
