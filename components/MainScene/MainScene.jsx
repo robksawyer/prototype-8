@@ -9,31 +9,18 @@ import { useTweaks } from 'use-tweaks'
 import { useInView } from 'react-intersection-observer'
 import useMobileDetect from 'use-mobile-detect-hook'
 import {
-  extend,
+  // extend,
   Canvas,
   useFrame,
   useThree,
-  useLoader,
+  // useLoader,
 } from 'react-three-fiber'
-import {
-  EffectComposer,
-  Bloom,
-  ChromaticAberration,
-} from '@react-three/postprocessing'
-import {
-  MathUtils,
-  PlaneBufferGeometry,
-  TextureLoader,
-  RepeatWrapping,
-  Vector3,
-  BoxHelper,
-  SpotLightHelper,
-  PointLightHelper,
-} from 'three'
-import { useHelper, OrbitControls } from '@react-three/drei'
+import { EffectComposer } from '@react-three/postprocessing'
+import * as THREE from 'three'
+import { Html, useHelper, useTexture, OrbitControls } from '@react-three/drei'
 // import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js'
-import { VertexNormalsHelper } from 'three/examples/jsm/helpers/VertexNormalsHelper'
-import { FaceNormalsHelper } from 'three/examples/jsm/helpers/FaceNormalsHelper'
+// import { VertexNormalsHelper } from 'three/examples/jsm/helpers/VertexNormalsHelper'
+// import { FaceNormalsHelper } from 'three/examples/jsm/helpers/FaceNormalsHelper'
 import { gsap } from 'gsap'
 
 import styles from './MainScene.module.css'
@@ -77,6 +64,8 @@ const Scene = () => {
   const { scene } = useThree()
   const group = useRef()
 
+  const texture = useTexture('/3d/textures/checkerboard.jpg')
+
   const spotLight = useRef()
   const pointLight = useRef()
 
@@ -90,11 +79,11 @@ const Scene = () => {
   })
 
   useEffect(() => void (spotLight.current.target = mesh.current), [scene])
-  useHelper(spotLight, SpotLightHelper, 'teal')
-  useHelper(pointLight, PointLightHelper, 0.5, 'hotpink')
-  useHelper(mesh, BoxHelper, '#272740')
-  useHelper(mesh, VertexNormalsHelper, 1, '#272740')
-  useHelper(mesh, FaceNormalsHelper, 0.5, '#272740')
+  // useHelper(spotLight, SpotLightHelper, 'teal')
+  // useHelper(pointLight, PointLightHelper, 0.5, 'hotpink')
+  // useHelper(mesh, BoxHelper, '#272740')
+  // useHelper(mesh, VertexNormalsHelper, 1, '#272740')
+  // useHelper(mesh, FaceNormalsHelper, 0.5, '#272740')
 
   return (
     <>
@@ -115,8 +104,9 @@ const Scene = () => {
         distance={20}
       />
       <mesh ref={mesh} position={[0, 2, 0]} castShadow>
-        <boxGeometry attach="geometry" />
-        <meshStandardMaterial attach="material" color="lightblue" />
+        <icosahedronGeometry args={[1, 1]} attach="geometry" />
+        <meshBasicMaterial attach="material" map={texture} />
+        {/* <meshStandardMaterial wireframe attach="material" color="lightblue" /> */}
       </mesh>
       <mesh rotation-x={-Math.PI / 2} receiveShadow>
         <planeBufferGeometry args={[100, 100]} attach="geometry" />
@@ -148,7 +138,13 @@ const MainScene = (props) => {
         }}
       >
         <fog attach="fog" args={['floralwhite', 0, 20]} />
-        <Suspense fallback={<Loader />}>
+        <Suspense
+          fallback={
+            <Html>
+              <Loader />
+            </Html>
+          }
+        >
           <Scene />
         </Suspense>
 
