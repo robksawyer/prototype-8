@@ -5,13 +5,16 @@ import React, { Suspense, useRef, useEffect } from 'react'
 import PropTypes from 'prop-types'
 import useErrorBoundary from 'use-error-boundary'
 
+import * as THREE from 'three'
+import { Canvas, useFrame, useThree, extend } from 'react-three-fiber'
+import { EffectComposer, ShaderPass, RenderPass } from 'postprocessing'
+// import { EffectComposer } from '@react-three/postprocessing'
+import { Html, useHelper, useTexture, OrbitControls } from '@react-three/drei'
+
 import { useTweaks } from 'use-tweaks'
 import { useInView } from 'react-intersection-observer'
 import useMobileDetect from 'use-mobile-detect-hook'
-import { Canvas, useFrame, useThree } from 'react-three-fiber'
-import { EffectComposer } from '@react-three/postprocessing'
-import * as THREE from 'three'
-import { Html, useHelper, useTexture, OrbitControls } from '@react-three/drei'
+
 // import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js'
 // import { VertexNormalsHelper } from 'three/examples/jsm/helpers/VertexNormalsHelper'
 // import { FaceNormalsHelper } from 'three/examples/jsm/helpers/FaceNormalsHelper'
@@ -23,6 +26,10 @@ import Loader from '../Loader'
 
 // Shader stack
 import './shaders/defaultMaterial'
+import './shaders/lineMaterial'
+
+// Postprocessing shader
+import { PixelShader } from './shaders/pixelShader'
 
 // Texture loading examples
 // const envMap = useCubeTexture(
@@ -51,15 +58,45 @@ import './shaders/defaultMaterial'
 //    color="#3083DC"
 //  />
 
+extend({ EffectComposer, ShaderPass, RenderPass, PixelShader })
+
 // Effects for the main scene
-// const Effects = () => {
-//   return <EffectComposer></EffectComposer>
-// }
+// @see https://inspiring-wiles-b4ffe0.netlify.app/5-recipes-effects
+const PPEffects = () => {
+  const { scene, gl, size, camera } = useThree()
+  const composer = useRef()
+
+  useEffect(() => {
+    composer.current.renderer.setSize(size.width, size.height)
+  }, [size])
+
+  // This takes over as the main render-loop (when 2nd arg is set to true)
+  useFrame(
+    ({ scene, camera }) => composer.current.renderer.render(scene, camera),
+    1
+  )
+
+  return (
+    <effectComposer ref={composer} args={[gl]}>
+      <renderPass attach="passes" scene={scene} camera={camera} />
+      <shaderPass
+        attach="passes"
+        args={[PixelShader]}
+        scene={scene}
+        camera={camera}
+        width={window.innerWidth}
+        height={window.innerHeight}
+        renderToScreen
+      />
+    </effectComposer>
+  )
+}
 
 const ENABLE_HELPERS = 0
 
 const Scene = () => {
-  const mesh = useRef()
+  const ico = useRef()
+  const icoLines = useRef()
   const { scene } = useThree()
   const group = useRef()
 
@@ -71,20 +108,42 @@ const Scene = () => {
   texture.wrapS = texture.wrapT = THREE.MirroredRepeatWrapping
 
   useFrame(({ clock, mouse }) => {
-    mesh.current.rotation.x = Math.sin(clock.elapsedTime) / 6
-    mesh.current.rotation.y = Math.sin(clock.elapsedTime) / 6
-    // mesh.current.rotation.z = (Math.sin(clock.elapsedTime) * Math.PI) / 4
-    // mesh.current.position.x = Math.sin(clock.elapsedTime)
-    // mesh.current.position.z = Math.sin(clock.elapsedTime)
+    ico.current.rotation.x = Math.sin(clock.elapsedTime) / 6
+    ico.current.rotation.y = Math.sin(clock.elapsedTime) / 6
+
+    icoLines.current.rotation.x = ico.current.rotation.x
+    icoLines.current.rotation.y = ico.current.rotation.y
+    // ico.current.rotation.z = (Math.sin(clock.elapsedTime) * Math.PI) / 4
+    // ico.current.position.x = Math.sin(clock.elapsedTime)
+    // ico.current.position.z = Math.sin(clock.elapsedTime)
     // group.current.rotation.y += 0.02
 
-    mesh.current.material.uniforms.mouse.value = new THREE.Vector2(
+    ico.current.material.uniforms.mouse.value = new THREE.Vector2(
       mouse.x,
       mouse.y
     )
   })
 
-  useEffect(() => void (spotLight.current.target = mesh.current), [scene])
+  useEffect(() => {
+    if (icoLines && icoLines.current) {
+      const length = icoLines.current.geometry.attributes.position.array.length
+      // console.log('length', length)
+
+      let vary = []
+      for (let i = 0; i < length / 3; i++) {
+        // Three diffferent vectors
+        vary.push(0, 0, 1, 0, 1, 0, 1, 0, 0)
+      }
+
+      let aVary = new Float32Array(vary)
+      icoLines.current.geometry.setAttribute(
+        'aVary',
+        new THREE.BufferAttribute(aVary, 3)
+      )
+    }
+  }, [])
+
+  useEffect(() => void (spotLight.current.target = ico.current), [scene])
   if (ENABLE_HELPERS) {
     // useHelper(spotLight, SpotLightHelper, 'teal')
     // useHelper(pointLight, PointLightHelper, 0.5, 'hotpink')
@@ -111,23 +170,21 @@ const Scene = () => {
         angle={0.5}
         distance={20}
       />
-      <mesh ref={mesh} position={[0, 2, 0]} castShadow>
+
+      <mesh ref={ico} position={[0, 2, 0]} castShadow>
         <icosahedronGeometry args={[1, 1]} attach="geometry" />
         <defaultMaterial
           attach="material"
           side={THREE.DoubleSide}
-          time={0}
           landscape={texture}
-          // resolution={new THREE.Vector4()}
-          // uvRate1={new THREE.Vector2(1, 1)}
         />
-
-        {/* Standard Color Material Example */}
-        {/* <meshStandardMaterial attach="material" color="lightblue" /> */}
-
-        {/* Texture Material Example */}
-        {/* <meshBasicMaterial attach="material" map={texture} /> */}
       </mesh>
+
+      <mesh ref={icoLines} position={[0, 2, 0]}>
+        <icosahedronBufferGeometry args={[1.001, 1]} attach="geometry" />
+        <lineMaterial attach="material" side={THREE.DoubleSide} />
+      </mesh>
+
       <mesh rotation-x={-Math.PI / 2} receiveShadow>
         <planeBufferGeometry args={[100, 100]} attach="geometry" />
         <shadowMaterial attach="material" opacity={0.5} />
@@ -154,10 +211,10 @@ const MainScene = (props) => {
         style={{
           width: '100vw',
           height: 'calc(100vh - 50px)',
-          background: 'black',
+          background: '#111111',
         }}
       >
-        <fog attach="fog" args={['black', 0, 20]} />
+        <fog attach="fog" args={['#111111', 0, 20]} />
         <Suspense
           fallback={
             <Html>
@@ -168,7 +225,7 @@ const MainScene = (props) => {
           <Scene />
         </Suspense>
 
-        {/* <Effects /> */}
+        {/* <PPEffects /> */}
         <OrbitControls />
       </Tag>
     </ErrorBoundary>

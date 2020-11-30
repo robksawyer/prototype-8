@@ -16,6 +16,7 @@ varying vec2 vUv;
 varying vec3 vPosition;
 varying vec3 vNormal;
 varying vec3 eyeVector;
+varying vec3 vVary;
 
 float PI = 3.14159265358979323846264338;
 
@@ -37,29 +38,16 @@ vec2 hash22(vec2 p) {
 }
 
 void main() {
-
-    // @see https://community.khronos.org/t/getting-the-normal-with-dfdx-and-dfdy/70177
-    vec3 X = dFdx(vNormal);
-    vec3 Y = dFdy(vNormal);
-    vec3 normal = normalize(cross(X,Y));
-    float diffuse = dot(normal, vec3(1.));
+     
+    float width = 2.;
+    vec3 d = fwidth(vVary);
+    vec3 s = smoothstep( d * (width + 0.5), d * (width - 0.5), vVary);
     
-    vec2 rand = hash22(vec2(floor(diffuse * 10.)));
+    float line = max(s.x, max(s.y, s.z));
+    if (line < 0.1) discard;
 
-    // Handles distortion
-    vec2 uvv = vec2(
-        sign(rand.x - 0.5) * 1. + (rand.x - 0.5) * .6, 
-        sign(rand.y - 0.5) * 1. + (rand.y - 0.5) * .6
-    );
-    vec2 uv = uvv * gl_FragCoord.xy / vec2(1000.);
-
-    // https://www.khronos.org/registry/OpenGL-Refpages/gl4/html/refract.xhtml
-    vec3 refracted = refract(eyeVector, normal, 1./3.);
-    uv += 0.2 * refracted.xy;
-    
-    vec4 t = texture2D(landscape, uv);
-    // gl_FragColor = vec4(vUv, 0.0, 1.);
-    gl_FragColor = t;
+    // Smooth out the lines
+    gl_FragColor = vec4( mix(vec3(1.), vec3(0.), 1. - line), 1. );
 }
 
 

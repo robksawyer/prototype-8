@@ -1,18 +1,18 @@
 /**
- * @file shaders/defaultMaterial/index.js
- * Basic shader setup and material example.
+ * @file shaders/LineMaterial/index.js
+ * Shader to handle shading lines
  *
  * Usage:
  *
  *    import { extend } from 'react-three-fiber
- *    import { DefaultMaterial } from './shaders/defaultMaterial'
+ *    import { LineMaterial } from './shaders/LineMaterial'
  *
- *    extend({ DefaultMaterial })
+ *    extend({ LineMaterial })
  *
  *    ... later in the React component
  *    <mesh>
  *      ...
- *      <defaultMaterial time={0} ... />
+ *      <LineMaterial time={0} ... />
  *    </mesh>
  *
  */
@@ -24,14 +24,13 @@ import vertex from './default.vert'
 import fragment from './default.frag'
 
 /**
- * DefaultMaterial
+ * LineMaterial
  * @param {*} uniforms
  */
-const DefaultMaterial = shaderMaterial(
+const LineMaterial = shaderMaterial(
   {
     time: 0,
     resolution: new THREE.Vector4(),
-    landscape: null,
     mouse: new THREE.Vector2(),
     // landscape: new THREE.TextureLoader(
     //   '/3d/textures/checkerboard.jpg',
@@ -46,7 +45,7 @@ const DefaultMaterial = shaderMaterial(
   // fragment shader
   fragment,
   (material) => {
-    console.log('material', material)
+    console.log('lineMaterial', material)
     material.side = THREE.DoubleSide
     // material.wireframe = false
     // material.vertexColors = true
@@ -61,4 +60,4 @@ const DefaultMaterial = shaderMaterial(
   }
 )
 
-extend({ DefaultMaterial })
+extend({ LineMaterial })

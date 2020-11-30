@@ -26,18 +26,21 @@
 // attribute vec3 normal;
 // attribute vec2 uv;
 
-// uniform float time; 
-// uniform vec2 mouse;
+// uniform float time;
+uniform vec2 mouse;
 varying vec2 vUv;
-// varying vec3 vPosition;
-// varying vec2 pixels;
+varying vec3 vPosition;
+varying vec2 pixels;
 varying vec3 vNormal;
 varying vec3 eyeVector;
+varying vec3 vVary;
+varying vec3 aVary;
 
 float PI = 3.14159265358979323846264338;
 
 void main() {
     vUv = uv;
+    vVary = aVary;
 
     vNormal = normalize(normalMatrix * normal);
     

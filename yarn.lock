@@ -1408,10 +1408,10 @@
     utility-types "^3.10.0"
     zustand "^3.0.3"
 
-"@react-three/postprocessing@^1.4.1":
-  version "1.4.1"
-  resolved "https://registry.yarnpkg.com/@react-three/postprocessing/-/postprocessing-1.4.1.tgz#bc55edac6dfb6b268b4de2fcc8fd179b582479e8"
-  integrity sha512-i7jM9GFP6wGlPg3iKueDU+HrnRkSf+zhJMHc5E9Ku5+nZjGdeM4Dk1aUkb+AhnloGkcpiB5LBmqPpdvVWRgSCQ==
+"@react-three/postprocessing@^1.5.0":
+  version "1.5.0"
+  resolved "https://registry.yarnpkg.com/@react-three/postprocessing/-/postprocessing-1.5.0.tgz#cbd110ee41d0e8fe1830b1136eeb505853fc0650"
+  integrity sha512-sV0qoGfjCVBk/193gevMEIhJ/ocjk1LUzrpuaa0wvRvcVk17bF1586opGas8WGd5jNmz6dzq8qKYCYDr4hXz5Q==
   dependencies:
     postprocessing "^6.17.1"
     react-merge-refs "^1.1.0"
