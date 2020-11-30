@@ -32,13 +32,7 @@ const LineMaterial = shaderMaterial(
     time: 0,
     resolution: new THREE.Vector4(),
     mouse: new THREE.Vector2(),
-    // landscape: new THREE.TextureLoader(
-    //   '/3d/textures/checkerboard.jpg',
-    //   (texture) => {
-    //     console.log('texture', texture)
-    //     texture.wrapS = texture.wrapT = THREE.RepeatWrapping
-    //   }
-    // ),
+    aVary: 0,
   },
   // vertex shader
   vertex,
@@ -46,7 +40,7 @@ const LineMaterial = shaderMaterial(
   fragment,
   (material) => {
     console.log('lineMaterial', material)
-    material.side = THREE.DoubleSide
+    // material.side = THREE.DoubleSide
     // material.wireframe = false
     // material.vertexColors = true
     // material.flatShading = true

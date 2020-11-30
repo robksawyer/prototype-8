@@ -20,23 +20,6 @@ varying vec3 vVary;
 
 float PI = 3.14159265358979323846264338;
 
-
-// hash12
-// http://glslsandbox.com/e#47182.0
-float hash12(vec2 p) {
-	p = fract(p * vec2(5.3983, 5.4427));
-    p += dot(p.yx, p.xy + vec2(21.5351, 14.3137));
-	return fract(p.x * p.y * 95.4337);
-}
-
-// hash22
-// http://glslsandbox.com/e#47182.0
-vec2 hash22(vec2 p) {
-	p = fract(p * vec2(5.3983, 5.4427));
-    p += dot(p.yx, p.xy +  vec2(21.5351, 14.3137));
-	return fract(vec2(p.x * p.y * 95.4337, p.x * p.y * 97.597));
-}
-
 void main() {
      
     float width = 2.;
@@ -48,6 +31,7 @@ void main() {
 
     // Smooth out the lines
     gl_FragColor = vec4( mix(vec3(1.), vec3(0.), 1. - line), 1. );
+    gl_FragColor = vec4(vVary, 1.);
 }
 
 

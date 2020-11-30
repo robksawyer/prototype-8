@@ -11,9 +11,9 @@ import {
 import { EffectComposer, Noise, Outline } from '@react-three/postprocessing'
 
 // Postprocessing shader
-// import { PixelShader } from './shaders/pixelShader'
+import { PixelShader } from './shaders/pixelShader'
 
-extend({ EffectComposer, ShaderPass, RenderPass })
+extend({ EffectComposer, ShaderPass, RenderPass, PixelShader })
 
 export const PostProcessing = ({ meshRefs = [] }) => {
   const { scene, gl, size, camera } = useThree()
@@ -30,11 +30,11 @@ export const PostProcessing = ({ meshRefs = [] }) => {
   //   1
   // )
 
-  console.log('meshRefs', meshRefs)
   return (
     <EffectComposer ref={composer} args={[gl]}>
       <Noise blendFunction={BlendFunction.MULTIPLY} />
-      <Outline
+      {/* <shaderPass attachArray="passes" args={[PixelShader]} /> */}
+      {/* <Outline
         selection={meshRefs} // selection of objects that will be outlined
         // selectionLayer={10} // selection layer
         blendFunction={BlendFunction.SCREEN} // set this to BlendFunction.ALPHA for dark outlines
@@ -49,7 +49,7 @@ export const PostProcessing = ({ meshRefs = [] }) => {
         // kernelSize={KernelSize.LARGE} // blur kernel size
         blur={false} // whether the outline should be blurred
         xRay={true} // indicates whether X-Ray outlines are enabled
-      />
+      /> */}
     </EffectComposer>
   )
 }

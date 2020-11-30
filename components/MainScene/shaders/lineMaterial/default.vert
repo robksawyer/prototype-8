@@ -33,8 +33,9 @@ varying vec3 vPosition;
 varying vec2 pixels;
 varying vec3 vNormal;
 varying vec3 eyeVector;
+
 varying vec3 vVary;
-varying vec3 aVary;
+attribute vec3 aVary;
 
 float PI = 3.14159265358979323846264338;
 

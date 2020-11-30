@@ -60,6 +60,7 @@ void main() {
     vec4 t = texture2D(landscape, uv);
     // gl_FragColor = vec4(vUv, 0.0, 1.);
     gl_FragColor = t;
+    // gl_FragColor = vec4(eyeVector, 1.);
 }
 
 

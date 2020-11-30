@@ -75,8 +75,8 @@ const Scene = () => {
     ico.current.rotation.x = Math.sin(clock.elapsedTime) / 6
     ico.current.rotation.y = Math.sin(clock.elapsedTime) / 6
 
-    icoLines.current.rotation.x = ico.current.rotation.x
-    icoLines.current.rotation.y = ico.current.rotation.y
+    // icoLines.current.rotation.x = ico.current.rotation.x
+    // icoLines.current.rotation.y = ico.current.rotation.y
     // ico.current.rotation.z = (Math.sin(clock.elapsedTime) * Math.PI) / 4
     // ico.current.position.x = Math.sin(clock.elapsedTime)
     // ico.current.position.z = Math.sin(clock.elapsedTime)
@@ -91,7 +91,7 @@ const Scene = () => {
   useEffect(() => {
     if (icoLines && icoLines.current) {
       const length = icoLines.current.geometry.attributes.position.array.length
-      // console.log('length', length)
+      console.log('icoLines.current', icoLines.current)
 
       let vary = []
       for (let i = 0; i < length / 3; i++) {
@@ -106,12 +106,6 @@ const Scene = () => {
       )
     }
   }, [])
-
-  useEffect(() => {
-    if (!meshes) {
-      setMeshes([ico])
-    }
-  }, [ico])
 
   useEffect(() => void (spotLight.current.target = ico.current), [scene])
   if (ENABLE_HELPERS) {
@@ -152,7 +146,8 @@ const Scene = () => {
 
       <mesh ref={icoLines} position={[0, 2, 0]}>
         <icosahedronBufferGeometry args={[1.001, 1]} attach="geometry" />
-        <lineMaterial attach="material" side={THREE.DoubleSide} />
+        <lineMaterial attach="material" />
+        {/* <meshNormalMaterial attach="material" /> */}
       </mesh>
 
       <mesh rotation-x={-Math.PI / 2} receiveShadow>
@@ -177,7 +172,7 @@ const MainScene = (props) => {
       <Tag
         colorManagement
         shadowMap
-        camera={{ position: [-5, 5, 5] }}
+        camera={{ position: [-2, 5, 2] }}
         className={`${styles.main_scene} ${
           styles[`main_scene__${variant}`]
         } ${className}`}
