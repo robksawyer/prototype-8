@@ -1,14 +1,12 @@
 /**
  * @file MainScene.js
  */
-import React, { Suspense, useRef, useEffect } from 'react'
+import React, { Suspense, useRef, useEffect, useState } from 'react'
 import PropTypes from 'prop-types'
 import useErrorBoundary from 'use-error-boundary'
 
 import * as THREE from 'three'
 import { Canvas, useFrame, useThree, extend } from 'react-three-fiber'
-import { EffectComposer, ShaderPass, RenderPass } from 'postprocessing'
-// import { EffectComposer } from '@react-three/postprocessing'
 import { Html, useHelper, useTexture, OrbitControls } from '@react-three/drei'
 
 import { useTweaks } from 'use-tweaks'
@@ -28,8 +26,7 @@ import Loader from '../Loader'
 import './shaders/defaultMaterial'
 import './shaders/lineMaterial'
 
-// Postprocessing shader
-import { PixelShader } from './shaders/pixelShader'
+import { PostProcessing } from './PostProcessing'
 
 // Texture loading examples
 // const envMap = useCubeTexture(
@@ -58,43 +55,10 @@ import { PixelShader } from './shaders/pixelShader'
 //    color="#3083DC"
 //  />
 
-extend({ EffectComposer, ShaderPass, RenderPass, PixelShader })
-
-// Effects for the main scene
-// @see https://inspiring-wiles-b4ffe0.netlify.app/5-recipes-effects
-const PPEffects = () => {
-  const { scene, gl, size, camera } = useThree()
-  const composer = useRef()
-
-  useEffect(() => {
-    composer.current.renderer.setSize(size.width, size.height)
-  }, [size])
-
-  // This takes over as the main render-loop (when 2nd arg is set to true)
-  useFrame(
-    ({ scene, camera }) => composer.current.renderer.render(scene, camera),
-    1
-  )
-
-  return (
-    <effectComposer ref={composer} args={[gl]}>
-      <renderPass attach="passes" scene={scene} camera={camera} />
-      <shaderPass
-        attach="passes"
-        args={[PixelShader]}
-        scene={scene}
-        camera={camera}
-        width={window.innerWidth}
-        height={window.innerHeight}
-        renderToScreen
-      />
-    </effectComposer>
-  )
-}
-
 const ENABLE_HELPERS = 0
 
 const Scene = () => {
+  const [meshes, setMeshes] = useState()
   const ico = useRef()
   const icoLines = useRef()
   const { scene } = useThree()
@@ -143,6 +107,12 @@ const Scene = () => {
     }
   }, [])
 
+  useEffect(() => {
+    if (!meshes) {
+      setMeshes([ico])
+    }
+  }, [ico])
+
   useEffect(() => void (spotLight.current.target = ico.current), [scene])
   if (ENABLE_HELPERS) {
     // useHelper(spotLight, SpotLightHelper, 'teal')
@@ -190,6 +160,9 @@ const Scene = () => {
         <shadowMaterial attach="material" opacity={0.5} />
       </mesh>
       <gridHelper args={[30, 30, 30]} />
+
+      {/* PostProcessing Effects */}
+      <PostProcessing meshRefs={meshes} />
     </>
   )
 }
@@ -224,8 +197,6 @@ const MainScene = (props) => {
         >
           <Scene />
         </Suspense>
-
-        {/* <PPEffects /> */}
         <OrbitControls />
       </Tag>
     </ErrorBoundary>
