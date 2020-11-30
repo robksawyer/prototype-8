@@ -75,8 +75,8 @@ const Scene = () => {
     ico.current.rotation.x = Math.sin(clock.elapsedTime) / 6
     ico.current.rotation.y = Math.sin(clock.elapsedTime) / 6
 
-    // icoLines.current.rotation.x = ico.current.rotation.x
-    // icoLines.current.rotation.y = ico.current.rotation.y
+    icoLines.current.rotation.x = ico.current.rotation.x
+    icoLines.current.rotation.y = ico.current.rotation.y
     // ico.current.rotation.z = (Math.sin(clock.elapsedTime) * Math.PI) / 4
     // ico.current.position.x = Math.sin(clock.elapsedTime)
     // ico.current.position.z = Math.sin(clock.elapsedTime)
@@ -147,7 +147,7 @@ const Scene = () => {
       <mesh ref={icoLines} position={[0, 2, 0]}>
         <icosahedronBufferGeometry args={[1.001, 1]} attach="geometry" />
         <lineMaterial attach="material" />
-        {/* <meshNormalMaterial attach="material" /> */}
+        {/* <meshNormalMaterial wireframe attach="material" /> */}
       </mesh>
 
       <mesh rotation-x={-Math.PI / 2} receiveShadow>

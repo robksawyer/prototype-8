@@ -31,7 +31,6 @@ void main() {
 
     // Smooth out the lines
     gl_FragColor = vec4( mix(vec3(1.), vec3(0.), 1. - line), 1. );
-    gl_FragColor = vec4(vVary, 1.);
 }
 
 
