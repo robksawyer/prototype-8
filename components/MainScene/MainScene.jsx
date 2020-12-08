@@ -150,11 +150,11 @@ const Scene = () => {
         {/* <meshNormalMaterial wireframe attach="material" /> */}
       </mesh>
 
-      <mesh rotation-x={-Math.PI / 2} receiveShadow>
+      {/* <mesh rotation-x={-Math.PI / 2} receiveShadow>
         <planeBufferGeometry args={[100, 100]} attach="geometry" />
         <shadowMaterial attach="material" opacity={0.5} />
-      </mesh>
-      <gridHelper args={[30, 30, 30]} />
+      </mesh> */}
+      {/* <gridHelper args={[30, 30, 30]} /> */}
 
       {/* PostProcessing Effects */}
       <PostProcessing meshRefs={meshes} />
@@ -172,7 +172,7 @@ const MainScene = (props) => {
       <Tag
         colorManagement
         shadowMap
-        camera={{ position: [-2, 5, 2] }}
+        camera={{ position: [-2, 0, 0] }}
         className={`${styles.main_scene} ${
           styles[`main_scene__${variant}`]
         } ${className}`}
@@ -182,17 +182,29 @@ const MainScene = (props) => {
           background: '#111111',
         }}
       >
-        <fog attach="fog" args={['#111111', 0, 20]} />
+        {/* <fog attach="fog" args={['#111111', 0, 20]} /> */}
         <Suspense
           fallback={
-            <Html>
-              <Loader />
-            </Html>
+            null
+            // <Html>
+            //   <Loader />
+            // </Html>
           }
         >
           <Scene />
         </Suspense>
-        <OrbitControls />
+        <OrbitControls
+          autoRotate
+          enablePan={false}
+          minPolarAngle={0}
+          maxPolarAngle={Math.PI}
+          target={new THREE.Vector3(0, 1.5, 0)}
+          // minAzimuthAngle={0}
+          // maxAzimuthAngle={Math.PI / 2}
+          panSpeed={0.25}
+          enableZoom={false}
+          enableDamping={true}
+        />
       </Tag>
     </ErrorBoundary>
   )

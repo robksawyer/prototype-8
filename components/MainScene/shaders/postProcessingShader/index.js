@@ -8,17 +8,16 @@ import * as THREE from 'three'
 import { extend } from 'react-three-fiber'
 import { shaderMaterial } from '@react-three/drei'
 
+// Shader
 import frag from './default.frag'
 import vert from './default.vert'
 
-export const PixelShader = shaderMaterial({
+const PostProcessingShader = shaderMaterial({
   uniforms: {
-    tDiffuse: null,
     resolution: null,
-    pixelSize: 1,
   },
   vertexShader: vert,
   fragmentShader: frag,
 })
 
-extend({ PixelShader })
+extend({ PostProcessingShader })
